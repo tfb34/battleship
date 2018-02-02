@@ -17244,7 +17244,7 @@ module.exports = function(module) {
 
 
 
-const ship = ({ length }) => ({
+const Ship = ({ length }) => ({
 	length,
 
 	totalHits : 0,
@@ -17252,20 +17252,17 @@ const ship = ({ length }) => ({
 	bodyHits : new Array(this.length),
 
 	isSunk(){
-		if(this.totalHits === this.length){
-			return true;
-		}else{
-			return false;
-		}
+		return this.totalHits === this.length ? true : false;
 	},
 
 	hit(x){
 		this.bodyHits[x] = true;
+		this.totalHits += 1;
 	}
 
 });
 
-module.exports = ship;
+module.exports = Ship;
 
 /***/ })
 /******/ ]);
