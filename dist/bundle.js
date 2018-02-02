@@ -71,7 +71,13 @@
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ship__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ship___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__ship__);
 
+
+
+let battleship = __WEBPACK_IMPORTED_MODULE_1__ship___default()({length: 5});
+console.log(battleship);
 
 function component() {
   var element = document.createElement('div');
@@ -17231,6 +17237,35 @@ module.exports = function(module) {
 	return module;
 };
 
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+
+
+const ship = ({ length }) => ({
+	length,
+
+	totalHits : 0,
+
+	bodyHits : new Array(this.length),
+
+	isSunk(){
+		if(this.totalHits === this.length){
+			return true;
+		}else{
+			return false;
+		}
+	},
+
+	hit(x){
+		this.bodyHits[x] = true;
+	}
+
+});
+
+module.exports = ship;
 
 /***/ })
 /******/ ]);

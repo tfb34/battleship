@@ -1,4 +1,8 @@
 import _ from 'lodash';
+import ship from './ship';
+
+let battleship = ship({length: 5});
+console.log(battleship);
 
 function component() {
   var element = document.createElement('div');
