@@ -1,21 +1,52 @@
 
 
-const Ship = ({ length }) => ({
-	length,
+const Ship = ({length}) => {
 
-	totalHits : 0,
+	let totalHits = 0;
 
-	bodyHits : new Array(this.length),
+	let bodyHits = [];
 
-	isSunk(){
-		return this.totalHits === this.length ? true : false;
-	},
+	let coordinates = [];
 
-	hit(x){
-		this.bodyHits[x] = true;
+	function isSunk(){
+		return this.totalHits === length ? true : false;
+	};
+
+	function hit(x){
+		this.bodyHits.push(x);
 		this.totalHits += 1;
+	};
+
+	function setPosition(arr){
+		for(let i=0; i<arr.length; i++){
+			this.coordinates.push(arr[i]);
+		}
+	};
+
+	function isHit(pos){
+		for(let i=0; i<this.coordinates.length; i++){
+			let col = this.coordinates[i][0];
+			let row = this.coordinates[i][1];
+
+			if(pos[0] === col && pos[1] === row){
+				return true;
+			}
+		}
+		return false;
+	};
+
+
+	return{
+		length,
+		bodyHits,
+		totalHits,
+		coordinates,
+		isSunk,
+		hit,
+		setPosition,
+		isHit
 	}
 
-});
+};
 
 module.exports = Ship;
