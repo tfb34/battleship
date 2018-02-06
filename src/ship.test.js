@@ -23,7 +23,7 @@ test('hit(2) should mark position 2 as hit', () => {
 });
 
 
-test('setPosition() should set coordinates to given [[2,3],[2,4]]', () => {
+test('setPosition() takes a 2d array and should set coordinates to given [[2,3],[2,4]]', () => {
     const destroyer = Ship({ length: 2});
     const coordinates = [[2,3], [2,4]];
     destroyer.setPosition(coordinates);

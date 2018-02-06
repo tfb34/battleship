@@ -73,22 +73,66 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ship__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ship___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__ship__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__grid__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__grid___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__grid__);
 
 
 
-let battleship = __WEBPACK_IMPORTED_MODULE_1__ship___default()({length: 5});
+
+
+window.onload = function(){
+	let g = __WEBPACK_IMPORTED_MODULE_2__grid___default()({ playerName: 'player1'});
+	g.display(document.getElementById('playerGrid'));
+
+	let o = __WEBPACK_IMPORTED_MODULE_2__grid___default()({playerName: 'opponent'});
+	o.display(document.getElementById('opponentGrid'));
+}
+
+
+window.Grid = __WEBPACK_IMPORTED_MODULE_2__grid___default.a;
+/*
+let battleship = ship({length: 5});
 console.log(battleship);
 
 function component() {
   var element = document.createElement('div');
 
  // lodash, now imported by this script
-  element.innerHTML = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.join(['Hello', 'webpack'], ' ');
+  element.innerHTML = _.join(['Hello', 'webpack'], ' ');
 
   return element;
+}*/
+
+/**
+	creates players and sets coordinates for now without user input
+
+	randomly assign players turn, changes 
+	let gameOver = false;
+	while game is not over
+	if(player1.turn){
+
+         let them attack,
+         check if other players all ships r sunk then game is over = true, 
+         until no hits
+         next player's turn
+
+	}else{
+		AI
+	}*/
+/**
+let gameOver = false;
+
+while(!gameOver){
+	if(player1.turn){
+
+	}else{
+		//disable board by adding something over it where player cant click on anything
+	}
 }
 
-document.body.appendChild(component());
+*/
+
+//document.body.appendChild(component());
 
 
 /***/ }),
@@ -17244,25 +17288,158 @@ module.exports = function(module) {
 
 
 
-const Ship = ({ length }) => ({
-	length,
+const Ship = ({length}) => {
 
-	totalHits : 0,
+	let totalHits = 0;
 
-	bodyHits : new Array(this.length),
+	let bodyHits = [];
 
-	isSunk(){
-		return this.totalHits === this.length ? true : false;
-	},
+	let coordinates = [];
 
-	hit(x){
-		this.bodyHits[x] = true;
+	function isSunk(){
+		return this.totalHits === length ? true : false;
+	};
+
+	function hit(x){
+		this.bodyHits.push(x);
 		this.totalHits += 1;
+	};
+
+	function setPosition(arr){
+		for(let i=0; i<arr.length; i++){
+			this.coordinates.push(arr[i]);
+		}
+	};
+
+	function isHit(pos){
+		console.log("inside of isHit()");
+		console.log(this);
+		for(let i=0; i<this.coordinates.length; i++){
+			let col = this.coordinates[i][0];
+			//console.log(col);
+			let row = this.coordinates[i][1];
+			//console.log(row);
+
+			if(pos[0] === col && pos[1] === row){
+				return true;
+			}
+		}
+		return false;
+	};
+
+
+	return{
+		length,
+		bodyHits,
+		totalHits,
+		coordinates,
+		isSunk,
+		hit,
+		setPosition,
+		isHit
 	}
 
-});
+};
 
 module.exports = Ship;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+
+const Grid = ({playerName}) => {
+
+	let grid = _renderGrid(playerName);
+
+	function display(x){
+		if(x){
+			x.appendChild(this.grid);
+		}else{
+			document.getElementsByTagName('body')[0].appendChild(this.grid);
+		}
+	};
+
+	function enable(){
+		//remove class
+	}
+	function disable(){
+		//add class
+	};
+
+	return {
+		playerName,
+		grid,
+		display
+		//enable,
+		//disable,
+		//addHit,
+		//addMiss,
+		//addWrecked 
+	}
+};
+
+
+function _renderGrid(playerName){
+	let table = document.createElement('table');
+	table.setAttribute('id',playerName);//player or opponent
+
+	let tbody = document.createElement('tbody');
+
+	let header_tr = document.createElement('tr');
+	header_tr.setAttribute('class', 'table-header');
+
+	let null_td = document.createElement('td');
+	header_tr.appendChild(null_td);
+
+	for(let l = 65; l<75;l++){
+		let td = document.createElement('td');
+		td.innerHTML = String.fromCharCode(l); //A
+		header_tr.appendChild(td);
+	}
+
+	tbody.appendChild(header_tr);
+	// 11 rows // 11 columns
+	for(let r = 0; r<10; r++){
+		let tr = document.createElement('tr');
+		tr.setAttribute('id','battleship-row-'+r);
+
+		let rowNum = document.createElement('td');
+		rowNum.setAttribute('class', 'table-y-values');
+		rowNum.innerHTML = r;
+
+		tr.appendChild(rowNum);
+
+		for(let c = 0; c<10; c++){// 11 columns
+			let td = document.createElement('td');
+			td.setAttribute('id','c'+c+'r'+r);
+			if(playerName === 'opponent'){
+				td.setAttribute('class', 'clickable');
+				td.addEventListener("click", function(){ console.log('you clicked on '+this.id)});
+			}
+			tr.appendChild(td);
+		}
+		tbody.appendChild(tr);
+	}
+
+	table.appendChild(tbody);
+
+
+	//let frame = document.createElement('div');
+	//frame.setAttribute('class', 'tableWrapper');
+	//frame.setAttribute('id', playerName);
+	//frame.appendChild(table);
+
+	return table;
+}
+
+function _addListener(cell){
+	cell.addEventListener('click', function(){console.log("you clicked on "+this.id)});
+}
+
+module.exports = Grid;
+
+
 
 /***/ })
 /******/ ]);

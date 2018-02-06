@@ -25,14 +25,16 @@ const Gameboard = () => {
 	function recieveAttack(pos){
 		for(let i=0;i<this.ships.length; i++){
 			let ship = this.ships[i];
-			console.log(ship.coordinates);
+			console.log("traversing ships..."+(i+1));
 			if(ship.isHit(pos)){
+				console.log("yes it got hit");
 				ship.hit(pos);
 				return;
 			}
 		}
 		this.missedAttacks.push(pos);
 	};
+
 	// private
 
 

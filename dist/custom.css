@@ -1,0 +1,47 @@
+body{
+	padding:0;
+	margin:0;
+}
+table{
+	border-spacing: 0;
+}
+table td{
+	border:1px solid grey;
+	width:35px;
+	height:35px;
+	text-align:center;
+}
+
+.table-y-values{
+	border:0;
+	color:grey;
+}
+.table-header td{
+	border:0;
+	color: grey;
+}
+
+.clickable:hover{
+	background-color: rgba(80, 184, 72,0.5)
+}
+
+#battleship-grids{
+	width:100%;
+}
+#battleship-grids::after{
+	content:"";
+	display: table;
+	clear: both;
+}
+
+#playerGrid, #opponentGrid{
+	float:left;
+	width: 50%;
+}
+#player1{
+	float:right;
+	margin-right: 2em;
+}
+#opponent{
+	margin-left: 2em;
+}
