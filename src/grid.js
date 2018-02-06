@@ -11,17 +11,38 @@ const Grid = ({playerName}) => {
 		}
 	};
 
+	// called when it's player's turn
 	function enable(){
-		//remove class
+		document.getElementById('cover').className = "hide";
 	}
+
+	// called when it's opponent's turn
 	function disable(){
-		//add class
+		document.getElementById('cover').className = "show";
 	};
+
+	function markHit(pos){
+		let col = pos[0];
+		let row = pos[1];
+		let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		cell.innerHTML = 'X';
+		cell.className += ' hit';
+	}
+
+	function markMiss(pos){
+		let col = pos[0];
+		let row = pos[1];
+		let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		cell.innerHTML = '&#9679;';
+		cell.className += ' miss';
+	}
 
 	return {
 		playerName,
 		grid,
-		display
+		display,
+		enable,
+		disable
 		//enable,
 		//disable,
 		//addHit,
@@ -66,7 +87,7 @@ function _renderGrid(playerName){
 			td.setAttribute('id','c'+c+'r'+r);
 			if(playerName === 'opponent'){
 				td.setAttribute('class', 'clickable');
-				td.addEventListener("click", function(){ console.log('you clicked on '+this.id)});
+				td.addEventListener("click", function(){ console.log("you clicked on c:"+this.id[1]+" r: "+this.id[3]) });
 			}
 			tr.appendChild(td);
 		}
@@ -84,9 +105,7 @@ function _renderGrid(playerName){
 	return table;
 }
 
-function _addListener(cell){
-	cell.addEventListener('click', function(){console.log("you clicked on "+this.id)});
-}
+
 
 module.exports = Grid;
 

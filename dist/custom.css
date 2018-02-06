@@ -1,3 +1,7 @@
+:root{
+    --cell-height: 35px;
+}
+
 body{
 	padding:0;
 	margin:0;
@@ -7,8 +11,8 @@ table{
 }
 table td{
 	border:1px solid grey;
-	width:35px;
-	height:35px;
+	width: var(--cell-height);
+	height: var(--cell-height);
 	text-align:center;
 }
 
@@ -44,4 +48,24 @@ table td{
 }
 #opponent{
 	margin-left: 2em;
+}
+
+/*new*/
+#cover {
+    width: 100%;
+    height: calc(11*var(--cell-height)); /*user variable here like 11 * cell-height*/
+    background-color: rgba(100,90,20, 0.5);
+    position: absolute;
+}
+.hide{
+    display: none;
+}
+.show{
+    display: block;
+}
+.hit{
+	color:red;
+}
+.miss{
+	color: grey;
 }

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import ship from './ship';
-
 import Grid from './grid';
+
 
 window.onload = function(){
 	let g = Grid({ playerName: 'player1'});
