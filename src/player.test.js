@@ -1,4 +1,5 @@
-const Player = require('./player');
+//const Player = require('./player');
+import Player from './player';
 
 test('player should contain a gameboard', () => {
 	let player = Player();

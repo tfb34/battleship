@@ -1,9 +1,11 @@
 import Ship from './ship';
+import Grid from './grid';
 
 const Gameboard = () => {
 	let grid = _createGrid();
 	let ships = _createShips();
 	let missedAttacks = [];
+	let gridDOM;
 
 	function setCoordinates(){
 		for(let i =0;i<this.ships.length; i++){
@@ -35,6 +37,20 @@ const Gameboard = () => {
 		this.missedAttacks.push(pos);
 	};
 
+	// always in player grid
+	function createGridDOM(name, location){
+		this.gridDOM = Grid({ playerName : name });
+		this.gridDOM.display(location);
+
+		for(let i = 0;i<this.ships.length;i++){
+			let coordinates = this.ships[i].coordinates;
+			for(let x = 0; x < coordinates.length; x++){
+				//let col = coordinates[x][0];// may have to switch 
+				//let row = coordinates[x][1];// these values
+				this.gridDOM.markShip(coordinates[x]);// give [a,b]
+			}
+		}
+	};
 	// private
 
 
@@ -45,11 +61,13 @@ const Gameboard = () => {
 		setCoordinates,
 		isGameOver,
 		recieveAttack,
-
+		gridDOM,
+		createGridDOM
 	}
 };
 
-module.exports = Gameboard;
+export default Gameboard;
+
 
 // private
 
@@ -123,30 +141,26 @@ function _getCoordinates(grid, length){
 		_updateBoard(grid, coords);
 		_displayBoard(grid);
 		return coords;
-	};
+};
 
-	function _updateBoard(grid, coords){
+function _updateBoard(grid, coords){
 		for(let i = 0; i < coords.length; i++){
 			let col = coords[i][0];
 			let row = coords[i][1];
 
 			grid[col][row] = 'o'; // occupied
 		}
-	};
+};
 
-	function _getVerticalCoords(grid, col, row, length){
+function _getVerticalCoords(grid, col, row, length){
 
 		let coordinates = [];
 		if( (row + (length-1) < 10) && _isPathClear(grid,col,row,length,"down")){
-
-			// create some coords
 			coordinates.push([col,row]);
-
 			for(let i = 1; i<length; i++){
 				coordinates.push( [col, row+i] );
 			}
 		}else if( (row - (length-1) > -1) && _isPathClear(grid, col,row,length,"up")){
-			// create some coords
 			coordinates.push( [col,row]);
 			for(let i = 1; i<length; i++){
 				coordinates.push( [col, row-i] );
@@ -154,39 +168,48 @@ function _getCoordinates(grid, length){
 		}
 
 		return coordinates;
-	};
+};
 
-	function _isPathClear(grid, col,row,length, dir){
-		if(dir === "down"){
-			for(let i = 0; i<length; i++){
-				if(grid[col][row + i] === 'o'){
-					return false
-				}
+
+function _isPathClear(grid, col,row,length, dir){
+    let coordinates = [];
+	if(dir === "down"){
+		for(let i = 0; i<length; i++){
+			if(grid[col][row + i] === 'o'){
+				return false
 			}
-		}else if(dir === "up"){
-			for(let i = 0; i<length; i++){
-				if(grid[col][row - i] === 'o'){
-					return false
-				}
-			}
-		}else if(dir === "right"){
-			for(let i = 0; i<length; i++){
-				if(grid[col + i][row] === 'o'){
-					return false;
-				}
-			}
-		}else{
-			for(let i = 0; i<length; i++){
-				if(grid[col - i][row] === 'o'){
-					return false;
-				}
-			}
+            coordinates.push([col,row + i]);
 		}
-		return true;
-	
-	};
+	}else if(dir === "up"){
+		for(let i = 0; i<length; i++){
+			if(grid[col][row - i] === 'o'){
+				return false
+			}
+            coordinates.push([col,row - i]);
+		}
+	}else if(dir === "right"){
+		for(let i = 0; i<length; i++){
+			if(grid[col + i][row] === 'o'){
+				return false;
+			}
+            coordinates.push([col + i, row]);
+		}
+	}else{
+		for(let i = 0; i<length; i++){
+			if(grid[col - i][row] === 'o'){
+				return false;
+			}
+            coordinates.push([col - i,row]);
+		}
+	}
 
-	function _getHorizontalCoords(grid, col, row, length){
+    let axis = dir === "up" || dir === "down" ? "vertical" : "horizontal";
+
+    return _isBorderClear(grid,coordinates, axis);
+	
+};
+
+function _getHorizontalCoords(grid, col, row, length){
 		let coordinates = [];
 		if( (col + (length-1) < 10) && _isPathClear(grid, col,row,length,"right")){
 			// create some coords
@@ -203,9 +226,207 @@ function _getCoordinates(grid, length){
 		}
 
 		return coordinates;
-	};
+};
 
-	function _displayBoard(grid){
-		console.log(grid);
-	};
+function _isBorderClear(grid, coordinates, axis){
+    return _isLeftSideEmpty(grid, coordinates,axis) && _isUpSideEmpty(grid, coordinates,axis) && _isRightSideEmpty(grid, coordinates,axis) && _isDownSideEmpty(grid, coordinates,axis) ? true : false
+}
+// given a [c,r] returns true only if it finds 'o' 
+function _isCellTaken(grid,pos){
+	let col = pos[0];
+	let row = pos[1];
+
+    if(col < 0 || col > 9){
+        return false;
+    }else if(row < 0 || row > 9){
+        return false;
+    }
+
+	let cell = grid[col][row];
+
+	let isTaken;
+	if(cell){
+		isTaken = cell === 'e' ? false : true;
+	}else{
+		isTaken = false;
+	}
+	// cell is out of bounds. so cell is not taken. 
+	return isTaken;
+}
+
+
+function _isLeftSideEmpty(grid,coordinates, axis){
+
+	let startPos;
+	let lastPos;
+    let col;
+
+	if(coordinates.length === 1){
+		col = coordinates[0][0];
+		let row = coordinates[0][1];
+		startPos = [col-1,row-1];
+		lastPos = [col-1,row+1];
+	}else if(axis === "horizontal"){
+		let firstCoord = coordinates[0];
+		let secCoord = coordinates[coordinates.length-1];
+		col = Math.min(firstCoord[0], secCoord[0]);
+		let row = firstCoord[1];
+		startPos = [col-1,row-1];
+		lastPos = [col-1,row+1];
+	}else{// "vertical ?"
+		let firstCoord = coordinates[0];
+		let secCoord = coordinates[coordinates.length-1];
+		let minRow = Math.min(firstCoord[1],secCoord[1]);
+		let maxRow = Math.max(firstCoord[1],secCoord[1]);
+		col = firstCoord[0];
+		startPos = [col-1,minRow-1];
+		lastPos = [col-1,maxRow+1];
+	}
+
+	if(col < 0){
+        return true;
+    }
+
+	if(_isCellTaken(grid, startPos) || _isCellTaken(grid, lastPos)){
+		return false;
+	}
+	col = startPos[0];
+	let firstRow = Math.min(startPos[1], lastPos[1])+1;
+	let lastRow = Math.max(startPos[1], lastPos[1]);
+
+	for(let r = firstRow; r< lastRow; r++){
+        if(_isCellTaken(grid, [col,r])){
+            return false;
+        }
+	}
+	return true;
+}
+
+
+function _isRightSideEmpty(grid, coordinates, axis) {
+	let startPos;
+	let lastPos;
+    let col;
+
+	if(coordinates.length === 1){
+		col = coordinates[0][0];
+		let row = coordinates[0][1];
+		startPos = [col+1,row-1];
+		lastPos = [col+1,row+1];
+	}else if(axis === "horizontal"){
+		let firstCoord = coordinates[0];
+		let secCoord = coordinates[coordinates.length-1];
+	    col = Math.max(firstCoord[0], secCoord[0]);
+		let row = firstCoord[1];
+		startPos = [col+1,row-1];
+		lastPos = [col+1,row+1];
+	}else{
+		let firstCoord = coordinates[0];
+		let secCoord = coordinates[coordinates.length-1];
+		let minRow = Math.min(firstCoord[1],secCoord[1]);
+		let maxRow = Math.max(firstCoord[1],secCoord[1]);
+		col = firstCoord[0];
+		startPos = [col+1,minRow-1];
+		lastPos = [col+1,maxRow+1];
+	}
+
+    if(col > 9){
+        return true;
+    }
+	
+	if(_isCellTaken(grid, startPos) || _isCellTaken(grid, lastPos)){
+		return false;
+	}
+	col = startPos[0];
+	let firstRow = Math.min(startPos[1], lastPos[1])+1;
+	let lastRow = Math.max(startPos[1], lastPos[1]);
+
+	for(let r = firstRow; r< lastRow; r++){
+        if(_isCellTaken(grid, [col,r])){
+            return false;
+        }
+	}
+	return true;
+	
+
+}
+
+function _isUpSideEmpty(grid, coordinates, axis){
+	let minCol;
+	let maxCol;
+	let row;
+
+	if(coordinates.length === 1){
+		minCol = coordinates[0][0]; // first coord, col
+		maxCol = minCol + 1;
+		row = coordinates[0][1] - 1;
+	}else if(axis === "vertical"){
+        minCol = coordinates[0][0];
+        maxCol = minCol + 1;
+        let firstCoord = coordinates[0];
+        let lastCoord = coordinates[coordinates.length-1];
+        let minRow = Math.min(firstCoord[1], lastCoord[1]);
+        row = minRow - 1;
+	}else{// all coordinates have the same row
+        let firstCoord = coordinates[0];
+        let lastCoord = coordinates[coordinates.length-1];
+        minCol = Math.min(firstCoord[0], lastCoord[0]);
+        maxCol = Math.max(firstCoord[0], lastCoord[0]);
+        row = coordinates[0][1] - 1;
+	}
+    // nothing to check, on edge of grid
+    if(row < 0){
+        return true;
+    }
+	//traversing the top border
+	for(let i = minCol; i<maxCol;i++){
+        if(_isCellTaken(grid, [i, row])){
+            return false;
+        }
+	}
+    return true;
+}
+
+// good
+function _isDownSideEmpty(grid, coordinates, axis){
+    let minCol;
+    let maxCol;
+    let row;
+
+    if(coordinates.length === 1){
+        minCol = coordinates[0][0];
+        maxCol = minCol + 1;
+        row = coordinates[0][1] + 1;
+    }else if(axis === "vertical"){
+        minCol = coordinates[0][0];
+        maxCol = minCol + 1;
+        let firstCoord = coordinates[0];
+        let lastCoord = coordinates[coordinates.length-1];
+        let maxRow = Math.max(firstCoord[1], lastCoord[1]);// we want the bottom coord
+        row = maxRow + 1;
+    }else{
+        let firstCoord = coordinates[0];
+        let lastCoord = coordinates[coordinates.length-1];
+        minCol = Math.min(firstCoord[0], lastCoord[0]);
+        maxCol = Math.max(firstCoord[0], lastCoord[0]);
+        row = coordinates[0][1] + 1;
+    }
+
+    if(row > 9){
+        return true;
+    }
+
+    //traversing the bottom border
+    for(let i = minCol; i<maxCol;i++){
+        if(_isCellTaken(grid, [i, row])){
+            return false;
+        }
+    }
+    return true;
+
+}
+
+function _displayBoard(grid){
+	console.log(grid);
+};
 

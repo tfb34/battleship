@@ -65,7 +65,12 @@ table td{
 }
 .hit{
 	color:red;
+	background-color: rgba(234, 126, 126,0.5);
 }
 .miss{
 	color: grey;
+	background-color: beige;
+}
+.ship{
+	background-color: rgba(118, 167, 227,0.5);
 }

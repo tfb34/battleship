@@ -1,5 +1,6 @@
-const Gameboard = require('./gameboard');
+//const Gameboard = require('./gameboard');
 
+import Gameboard from './gameboard';
 //testing a command message, assert side effects
 test('should create a gameboard object', () => {
 	let gb = Gameboard();

@@ -1,5 +1,6 @@
 import Gameboard from './gameboard';
 
+
 const Player = () => {
 
 	let turn;
@@ -16,4 +17,5 @@ const Player = () => {
 
 };
 
-module.exports = Player;
+
+export default Player;

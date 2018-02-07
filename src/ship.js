@@ -39,7 +39,6 @@ const Ship = ({length}) => {
 		return false;
 	};
 
-
 	return{
 		length,
 		bodyHits,

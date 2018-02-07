@@ -36,13 +36,21 @@ const Grid = ({playerName}) => {
 		cell.innerHTML = '&#9679;';
 		cell.className += ' miss';
 	}
+	// use this function in gameboard module. traverse all the coordinates and update gameboard's grid
+	function markShip(pos){
+		let col = pos[0];
+		let row = pos[1];
+		let cell = document.querySelectorAll('#player #c'+col+'r'+row)[0];
+		cell.className += ' ship';
+	}
 
 	return {
 		playerName,
 		grid,
 		display,
 		enable,
-		disable
+		disable,
+		markShip
 		//enable,
 		//disable,
 		//addHit,
@@ -104,8 +112,6 @@ function _renderGrid(playerName){
 
 	return table;
 }
-
-
 
 module.exports = Grid;
 
