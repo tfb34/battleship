@@ -21,20 +21,29 @@ const Grid = ({playerName}) => {
 		document.getElementById('cover').className = "show";
 	};
 
-	function markHit(pos){
+	function markHit(pos, id){
 		let col = pos[0];
 		let row = pos[1];
-		let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = 'X';
 		cell.className += ' hit';
+		if(id === "opponent"){
+			cell.setAttribute("onclick", "");
+		}
 	}
 
-	function markMiss(pos){
+	function markMiss(pos, id){
+		console.log("inside markMiss");
 		let col = pos[0];
 		let row = pos[1];
-		let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = '&#9679;';
 		cell.className += ' miss';
+		if(id === "opponent"){
+			cell.setAttribute("onclick", "");
+		}
 	}
 	// use this function in gameboard module. traverse all the coordinates and update gameboard's grid
 	function markShip(pos){
@@ -50,7 +59,9 @@ const Grid = ({playerName}) => {
 		display,
 		enable,
 		disable,
-		markShip
+		markShip,
+		markMiss,
+		markHit
 		//enable,
 		//disable,
 		//addHit,
@@ -95,7 +106,9 @@ function _renderGrid(playerName){
 			td.setAttribute('id','c'+c+'r'+r);
 			if(playerName === 'opponent'){
 				td.setAttribute('class', 'clickable');
-				td.addEventListener("click", function(){ console.log("you clicked on c:"+this.id[1]+" r: "+this.id[3]) });
+				td.setAttribute('onclick', "playerInputHandler(this.id)");
+				// set up function in game module
+				//td.addEventListener("click", function(){ console.log("you clicked on c:"+this.id[1]+" r: "+this.id[3]) });
 			}
 			tr.appendChild(td);
 		}
@@ -103,13 +116,6 @@ function _renderGrid(playerName){
 	}
 
 	table.appendChild(tbody);
-
-
-	//let frame = document.createElement('div');
-	//frame.setAttribute('class', 'tableWrapper');
-	//frame.setAttribute('id', playerName);
-	//frame.appendChild(table);
-
 	return table;
 }
 

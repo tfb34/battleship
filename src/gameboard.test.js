@@ -2,6 +2,7 @@
 
 import Gameboard from './gameboard';
 //testing a command message, assert side effects
+
 test('should create a gameboard object', () => {
 	let gb = Gameboard();
 	expect(gb.grid.length).toBe(10);
@@ -25,14 +26,20 @@ test('set coordinates() should set coordinates of all ships and update gameboard
 });
 
 // command, assert side effects=(record missed coordinates, OR call hit on correct ship)
-test('recieveAttack() should update record of missed shot when no ships are hit', () => {
+test('recieveAttack() should increase missedAttacks to 1 when no ships are hit', () => {
 	let gb = Gameboard();
-	gb.recieveAttack([5,5]);
+	let isHit = gb.recieveAttack([5,5]);
+	expect(gb.successfulAttacks.length).toBe(0);
 	expect(gb.missedAttacks.length).toBe(1);
+	expect(isHit).toBeFalsy();
 });
 
-test('recieveAttack() should not record missed shot if ship is hit', () => {
+
+test('recieveAttack() should return true if hit damages a ship,assert side effects', () => {
 	let gb = Gameboard();
-	gb.ships[0].setPosition([5,5]);
+	gb.ships[9].setPosition([[5,5]]);
+	let isHit = gb.recieveAttack([5,5]);
+	expect(gb.successfulAttacks.length).toBe(1);
 	expect(gb.missedAttacks.length).toBe(0);
+	expect(isHit).toBeTruthy();
 });

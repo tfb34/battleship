@@ -93,13 +93,9 @@ const Ship = ({length}) => {
 	};
 
 	function isHit(pos){
-		console.log("inside of isHit()");
-		console.log(this);
 		for(let i=0; i<this.coordinates.length; i++){
 			let col = this.coordinates[i][0];
-			//console.log(col);
 			let row = this.coordinates[i][1];
-			//console.log(row);
 
 			if(pos[0] === col && pos[1] === row){
 				return true;
@@ -150,20 +146,29 @@ const Grid = ({playerName}) => {
 		document.getElementById('cover').className = "show";
 	};
 
-	function markHit(pos){
+	function markHit(pos, id){
 		let col = pos[0];
 		let row = pos[1];
-		let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = 'X';
 		cell.className += ' hit';
+		if(id === "opponent"){
+			cell.setAttribute("onclick", "");
+		}
 	}
 
-	function markMiss(pos){
+	function markMiss(pos, id){
+		console.log("inside markMiss");
 		let col = pos[0];
 		let row = pos[1];
-		let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
+		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = '&#9679;';
 		cell.className += ' miss';
+		if(id === "opponent"){
+			cell.setAttribute("onclick", "");
+		}
 	}
 	// use this function in gameboard module. traverse all the coordinates and update gameboard's grid
 	function markShip(pos){
@@ -179,7 +184,9 @@ const Grid = ({playerName}) => {
 		display,
 		enable,
 		disable,
-		markShip
+		markShip,
+		markMiss,
+		markHit
 		//enable,
 		//disable,
 		//addHit,
@@ -224,7 +231,9 @@ function _renderGrid(playerName){
 			td.setAttribute('id','c'+c+'r'+r);
 			if(playerName === 'opponent'){
 				td.setAttribute('class', 'clickable');
-				td.addEventListener("click", function(){ console.log("you clicked on c:"+this.id[1]+" r: "+this.id[3]) });
+				td.setAttribute('onclick', "playerInputHandler(this.id)");
+				// set up function in game module
+				//td.addEventListener("click", function(){ console.log("you clicked on c:"+this.id[1]+" r: "+this.id[3]) });
 			}
 			tr.appendChild(td);
 		}
@@ -232,13 +241,6 @@ function _renderGrid(playerName){
 	}
 
 	table.appendChild(tbody);
-
-
-	//let frame = document.createElement('div');
-	//frame.setAttribute('class', 'tableWrapper');
-	//frame.setAttribute('id', playerName);
-	//frame.appendChild(table);
-
 	return table;
 }
 
@@ -264,40 +266,71 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 let player = Object(__WEBPACK_IMPORTED_MODULE_2__player__["a" /* default */])();
 let opponent = Object(__WEBPACK_IMPORTED_MODULE_2__player__["a" /* default */])();
+let playerGrid;
+let playerMap;
+
+function playerInputHandler(coordinate) {
+        console.log(coordinate);
+        let col = parseInt(coordinate[1]);
+        let row = parseInt(coordinate[3]);
+        console.log("you clicked on c:"+col+" r: "+row);
+        // if player makes a hit
+        if(player.damage(opponent, [col,row])){
+            console.log("You got a hit!");
+            playerMap.markHit([col,row], "opponent");
+
+            if(opponent.isDead()){
+                player.stop(playerMap);
+                console.log("You won!");
+            }
+
+        }else{
+            console.log("oponnent's turn");
+            player.stop(playerMap);
+            playerMap.markMiss([col,row], "opponent");
+
+            let pos = opponent.getNextMove();
+            console.log("opponent's move: "+pos);
+            while(opponent.damage(player, pos)){
+                player.gameboard.gridDOM.markHit(pos,"player");
+                if(player.isDead()){
+                    console.log("You Lost. The machine has won");
+                    return;// ensures that player does not get enabled
+                }
+                pos = opponent.getNextMove();
+                console.log("opponent's move: "+pos);
+            }
+            console.log("opponent's move was a miss!");
+            player.gameboard.gridDOM.markMiss(pos,"player");// 
+            player.go(playerMap);
+        }
+        // body...
+    }
 
 window.onload = function(){
-	/**
-	let g = Grid({ playerName: 'player1'});
-	g.display(document.getElementById('playerGrid'));
-
-	let o = Grid({playerName: 'opponent'});
-	o.display(document.getElementById('opponentGrid'));
-*/
 
 	let gameOver = false;
 	// create and set gameboard and its ships
 	
-
+	// player
 	player.gameboard.setCoordinates(); // for now
+	// opponent/computer
 	opponent.gameboard.setCoordinates();// we will need to see its gameboard in console to test it out
-	let playerGrid = document.getElementById('playerGrid');
+	// create and display player's grid DOM
+	playerGrid = document.getElementById('playerGrid');
 	player.gameboard.createGridDOM("player", playerGrid);// shows ships
+	// player's opponent Map
+	playerMap = __WEBPACK_IMPORTED_MODULE_1__grid___default()({ playerName: "opponent"}, "playerInputHandler(this.id)");
+	playerMap.display(document.getElementById('opponentGrid'));
 
-	/**
-	let opponentMap = Grid({ playerName: "opponent" });
-
-	let currentPlayer = player;
-	while(!gameOver){
-
-	}
-	console.log("game is over");
-	*/
 }
 
 
 //window.Grid = Grid;
 window.opponent = opponent;
 window.player = player;
+window.playerInputHandler = playerInputHandler;
+//window.opponentMap = opponentMap;
 /*
 let battleship = ship({length: 5});
 console.log(battleship);
@@ -358,18 +391,77 @@ const Player = () => {
 	let gameboard = Object(__WEBPACK_IMPORTED_MODULE_0__gameboard__["a" /* default */])();
 
 	function damage(enemy,pos){
-		enemy.gameboard.recieveAttack(pos);
+        return enemy.recieveAttack(pos) ? true : false;
 	};
 
+	function stop(playerMap){
+		//this.gameboard.grid.disable();
+        playerMap.disable();
+	};
+
+	function go(playerMap){
+		//this.gameboard.grid.enable();
+        playerMap.enable();
+	};
+
+    function recieveAttack(pos){
+        return this.gameboard.recieveAttack(pos) ? true : false;
+    };
+
+    // for now make a random move
+    // return it only if it doesn't exist in missedMoves or hitMoves
+    function getNextMove(){
+        let pos = _getRandomCoordinate();
+
+        while(!_isValid(this.gameboard, pos)){
+            pos = _getRandomCoordinate();
+        }
+
+        return pos;
+    };
+
+    function isDead(){
+        return this.gameboard.isGameOver();
+    };
+    
 	return {
 		gameboard,
-		damage
+		damage,
+		stop,
+        go,
+        recieveAttack,
+        getNextMove,
+        isDead
 	}
 
 };
 
 
 /* harmony default export */ __webpack_exports__["a"] = (Player);
+
+// prevents AI from making the same move twice
+function _isValid(gameboard, pos){
+    let sA = gameboard.successfulAttacks;
+    console.log(sA);
+    for(let i = 0; i< sA.length; i++){
+        if(sA[i][0] === pos[0] &&  sA[i][1] === pos[1]){
+            return false;
+        }
+    }
+    let missedHits = gameboard.missedAttacks;
+    for(let x =0; x< missedHits.length; x++){
+        if(missedHits[x][0] === pos[0] && missedHits[x][1] === pos[1]){
+            return false;
+        }
+    }
+    return true;
+};
+
+function _getRandomCoordinate(){
+    let col = Math.floor(Math.random() * 10);
+    let row = Math.floor(Math.random() * 10);
+    return [col,row];
+}
 
 
 /***/ }),
@@ -388,6 +480,7 @@ const Gameboard = () => {
 	let grid = _createGrid();
 	let ships = _createShips();
 	let missedAttacks = [];
+    let successfulAttacks = [];
 	let gridDOM;
 
 	function setCoordinates(){
@@ -405,19 +498,25 @@ const Gameboard = () => {
 				return false;
 			}
 		}
+        return true;
 	};
 
+    // return true or false
 	function recieveAttack(pos){
 		for(let i=0;i<this.ships.length; i++){
 			let ship = this.ships[i];
 			console.log("traversing ships..."+(i+1));
+            console.log(pos);
 			if(ship.isHit(pos)){
 				console.log("yes it got hit");
 				ship.hit(pos);
-				return;
+                this.successfulAttacks.push(pos);
+                console.log(successfulAttacks);
+				return true;
 			}
 		}
 		this.missedAttacks.push(pos);
+        return false;
 	};
 
 	// always in player grid
@@ -436,7 +535,6 @@ const Gameboard = () => {
 	};
 	// private
 
-
 	return{
 		grid,
 		ships,
@@ -445,7 +543,8 @@ const Gameboard = () => {
 		isGameOver,
 		recieveAttack,
 		gridDOM,
-		createGridDOM
+		createGridDOM,
+        successfulAttacks
 	}
 };
 
@@ -762,7 +861,7 @@ function _isUpSideEmpty(grid, coordinates, axis){
         return true;
     }
 	//traversing the top border
-	for(let i = minCol; i<maxCol;i++){
+	for(let i = minCol; i<=maxCol;i++){
         if(_isCellTaken(grid, [i, row])){
             return false;
         }
@@ -800,7 +899,7 @@ function _isDownSideEmpty(grid, coordinates, axis){
     }
 
     //traversing the bottom border
-    for(let i = minCol; i<maxCol;i++){
+    for(let i = minCol; i<=maxCol;i++){
         if(_isCellTaken(grid, [i, row])){
             return false;
         }

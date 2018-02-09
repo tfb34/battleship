@@ -5,6 +5,7 @@ const Gameboard = () => {
 	let grid = _createGrid();
 	let ships = _createShips();
 	let missedAttacks = [];
+    let successfulAttacks = [];
 	let gridDOM;
 
 	function setCoordinates(){
@@ -22,19 +23,25 @@ const Gameboard = () => {
 				return false;
 			}
 		}
+        return true;
 	};
 
+    // return true or false
 	function recieveAttack(pos){
 		for(let i=0;i<this.ships.length; i++){
 			let ship = this.ships[i];
 			console.log("traversing ships..."+(i+1));
+            console.log(pos);
 			if(ship.isHit(pos)){
 				console.log("yes it got hit");
 				ship.hit(pos);
-				return;
+                this.successfulAttacks.push(pos);
+                console.log(successfulAttacks);
+				return true;
 			}
 		}
 		this.missedAttacks.push(pos);
+        return false;
 	};
 
 	// always in player grid
@@ -53,7 +60,6 @@ const Gameboard = () => {
 	};
 	// private
 
-
 	return{
 		grid,
 		ships,
@@ -62,7 +68,8 @@ const Gameboard = () => {
 		isGameOver,
 		recieveAttack,
 		gridDOM,
-		createGridDOM
+		createGridDOM,
+        successfulAttacks
 	}
 };
 
@@ -379,7 +386,7 @@ function _isUpSideEmpty(grid, coordinates, axis){
         return true;
     }
 	//traversing the top border
-	for(let i = minCol; i<maxCol;i++){
+	for(let i = minCol; i<=maxCol;i++){
         if(_isCellTaken(grid, [i, row])){
             return false;
         }
@@ -417,7 +424,7 @@ function _isDownSideEmpty(grid, coordinates, axis){
     }
 
     //traversing the bottom border
-    for(let i = minCol; i<maxCol;i++){
+    for(let i = minCol; i<=maxCol;i++){
         if(_isCellTaken(grid, [i, row])){
             return false;
         }

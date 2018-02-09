@@ -24,13 +24,9 @@ const Ship = ({length}) => {
 	};
 
 	function isHit(pos){
-		console.log("inside of isHit()");
-		console.log(this);
 		for(let i=0; i<this.coordinates.length; i++){
 			let col = this.coordinates[i][0];
-			//console.log(col);
 			let row = this.coordinates[i][1];
-			//console.log(row);
 
 			if(pos[0] === col && pos[1] === row){
 				return true;
