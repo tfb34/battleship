@@ -24,7 +24,6 @@ const Grid = ({playerName}) => {
 	function markHit(pos, id){
 		let col = pos[0];
 		let row = pos[1];
-		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
 		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = 'X';
 		cell.className += ' hit';
@@ -37,7 +36,6 @@ const Grid = ({playerName}) => {
 		console.log("inside markMiss");
 		let col = pos[0];
 		let row = pos[1];
-		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
 		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = '&#9679;';
 		cell.className += ' miss';
@@ -62,11 +60,6 @@ const Grid = ({playerName}) => {
 		markShip,
 		markMiss,
 		markHit
-		//enable,
-		//disable,
-		//addHit,
-		//addMiss,
-		//addWrecked 
 	}
 };
 
@@ -85,7 +78,7 @@ function _renderGrid(playerName){
 
 	for(let l = 65; l<75;l++){
 		let td = document.createElement('td');
-		td.innerHTML = String.fromCharCode(l); //A
+		td.innerHTML = String.fromCharCode(l); 
 		header_tr.appendChild(td);
 	}
 
@@ -107,8 +100,6 @@ function _renderGrid(playerName){
 			if(playerName === 'opponent'){
 				td.setAttribute('class', 'clickable');
 				td.setAttribute('onclick', "playerInputHandler(this.id)");
-				// set up function in game module
-				//td.addEventListener("click", function(){ console.log("you clicked on c:"+this.id[1]+" r: "+this.id[3]) });
 			}
 			tr.appendChild(td);
 		}

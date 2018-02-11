@@ -5,18 +5,25 @@ const Player = () => {
 
 	let turn;
 	let gameboard = Gameboard();
+    let successfulAttacks = [];
+    let missedAttacks = [];
 
 	function damage(enemy,pos){
-        return enemy.recieveAttack(pos) ? true : false;
+
+        if(enemy.recieveAttack(pos)){
+            this.successfulAttacks.push(pos);
+            return true;
+        }else{
+            this.missedAttacks.push(pos);
+            return false;
+        }
 	};
 
 	function stop(playerMap){
-		//this.gameboard.grid.disable();
         playerMap.disable();
 	};
 
 	function go(playerMap){
-		//this.gameboard.grid.enable();
         playerMap.enable();
 	};
 
@@ -24,15 +31,31 @@ const Player = () => {
         return this.gameboard.recieveAttack(pos) ? true : false;
     };
 
-    // for now make a random move
-    // return it only if it doesn't exist in missedMoves or hitMoves
+    function isShipSunk(ship){
+        return ship.isSunk();
+    }
+
+    function getShip(pos){ 
+        return this.gameboard.getShip(pos);
+    }
+
+    function showShipSunk(ship,id){
+
+        for(let i = 0; i< ship.length; i++){
+            let col = ship.coordinates[i][0];
+            let row = ship.coordinates[i][1];
+            let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
+            cell.className += ' wrecked';
+        }
+    }
+
     function getNextMove(){
         let pos = _getRandomCoordinate();
-
-        while(!_isValid(this.gameboard, pos)){
+        
+        while(!_isValid(this, pos)){
             pos = _getRandomCoordinate();
         }
-
+        
         return pos;
     };
 
@@ -47,7 +70,12 @@ const Player = () => {
         go,
         recieveAttack,
         getNextMove,
-        isDead
+        isDead,
+        isShipSunk,
+        showShipSunk,
+        getShip,
+        successfulAttacks,
+        missedAttacks
 	}
 
 };
@@ -56,15 +84,15 @@ const Player = () => {
 export default Player;
 
 // prevents AI from making the same move twice
-function _isValid(gameboard, pos){
-    let sA = gameboard.successfulAttacks;
-    console.log(sA);
+function _isValid(player, pos){
+    let sA = player.successfulAttacks;
+    
     for(let i = 0; i< sA.length; i++){
         if(sA[i][0] === pos[0] &&  sA[i][1] === pos[1]){
             return false;
         }
     }
-    let missedHits = gameboard.missedAttacks;
+    let missedHits = player.missedAttacks;
     for(let x =0; x< missedHits.length; x++){
         if(missedHits[x][0] === pos[0] && missedHits[x][1] === pos[1]){
             return false;

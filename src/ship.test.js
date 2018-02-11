@@ -18,7 +18,6 @@ test('isSunk() should return true when Ship is completely hit', () => {
 test('hit(2) should mark position 2 as hit', () => {
     const carrier = Ship({length: 3});
     carrier.hit(2);
-    //expect(carrier.bodyHits[2]).toBeTruthy();
     expect(carrier.totalHits).toBe(1);
 });
 

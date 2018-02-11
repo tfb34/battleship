@@ -149,7 +149,6 @@ const Grid = ({playerName}) => {
 	function markHit(pos, id){
 		let col = pos[0];
 		let row = pos[1];
-		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
 		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = 'X';
 		cell.className += ' hit';
@@ -162,7 +161,6 @@ const Grid = ({playerName}) => {
 		console.log("inside markMiss");
 		let col = pos[0];
 		let row = pos[1];
-		//let cell = document.querySelectorAll('#opponent #c'+col+'r'+row)[0];
 		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
 		cell.innerHTML = '&#9679;';
 		cell.className += ' miss';
@@ -187,11 +185,6 @@ const Grid = ({playerName}) => {
 		markShip,
 		markMiss,
 		markHit
-		//enable,
-		//disable,
-		//addHit,
-		//addMiss,
-		//addWrecked 
 	}
 };
 
@@ -210,7 +203,7 @@ function _renderGrid(playerName){
 
 	for(let l = 65; l<75;l++){
 		let td = document.createElement('td');
-		td.innerHTML = String.fromCharCode(l); //A
+		td.innerHTML = String.fromCharCode(l); 
 		header_tr.appendChild(td);
 	}
 
@@ -232,8 +225,6 @@ function _renderGrid(playerName){
 			if(playerName === 'opponent'){
 				td.setAttribute('class', 'clickable');
 				td.setAttribute('onclick', "playerInputHandler(this.id)");
-				// set up function in game module
-				//td.addEventListener("click", function(){ console.log("you clicked on c:"+this.id[1]+" r: "+this.id[3]) });
 			}
 			tr.appendChild(td);
 		}
@@ -259,7 +250,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__grid__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__grid___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__grid__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__player__ = __webpack_require__(3);
-//import _ from 'lodash';
 
 
 
@@ -270,110 +260,72 @@ let playerGrid;
 let playerMap;
 
 function playerInputHandler(coordinate) {
-        console.log(coordinate);
-        let col = parseInt(coordinate[1]);
-        let row = parseInt(coordinate[3]);
-        console.log("you clicked on c:"+col+" r: "+row);
-        // if player makes a hit
-        if(player.damage(opponent, [col,row])){
-            console.log("You got a hit!");
-            playerMap.markHit([col,row], "opponent");
 
-            if(opponent.isDead()){
-                player.stop(playerMap);
-                console.log("You won!");
-            }
-
-        }else{
-            console.log("oponnent's turn");
+    let col = parseInt(coordinate[1]);
+    let row = parseInt(coordinate[3]);
+        
+    // if player makes a hit
+    if(player.damage(opponent, [col,row])){
+    
+        playerMap.markHit([col,row], "opponent");
+        
+        let ship = opponent.getShip([col,row]);
+        if(opponent.isShipSunk(ship)){
+            opponent.showShipSunk(ship, "opponent");
+        }
+        if(opponent.isDead()){
             player.stop(playerMap);
-            playerMap.markMiss([col,row], "opponent");
+            let displayWinner = document.getElementById('display-winner');
+            displayWinner.innerHTML = "You Win!";
+        }
 
+    }else{// computer's turn
+            
+        player.stop(playerMap);
+        playerMap.markMiss([col,row], "opponent");
+
+        let refreshId = setInterval(function(){
+            
             let pos = opponent.getNextMove();
-            console.log("opponent's move: "+pos);
-            while(opponent.damage(player, pos)){
+                
+            if(!opponent.damage(player, pos)){
+                
+                player.gameboard.gridDOM.markMiss(pos,"player"); 
+                player.go(playerMap);
+                clearInterval(refreshId);
+            }else{
                 player.gameboard.gridDOM.markHit(pos,"player");
                 if(player.isDead()){
-                    console.log("You Lost. The machine has won");
-                    return;// ensures that player does not get enabled
+                    let displayWinner = document.getElementById('display-winner');
+                    displayWinner.innerHTML = "You Lose.";
+                    clearInterval(refreshId);// ensures that player does not get enabled
                 }
-                pos = opponent.getNextMove();
-                console.log("opponent's move: "+pos);
             }
-            console.log("opponent's move was a miss!");
-            player.gameboard.gridDOM.markMiss(pos,"player");// 
-            player.go(playerMap);
-        }
-        // body...
+        }, 2000);
+
     }
+       
+}
 
 window.onload = function(){
-
-	let gameOver = false;
-	// create and set gameboard and its ships
 	
 	// player
 	player.gameboard.setCoordinates(); // for now
 	// opponent/computer
-	opponent.gameboard.setCoordinates();// we will need to see its gameboard in console to test it out
-	// create and display player's grid DOM
+	opponent.gameboard.setCoordinates();
+
 	playerGrid = document.getElementById('playerGrid');
+    // player grid
 	player.gameboard.createGridDOM("player", playerGrid);// shows ships
-	// player's opponent Map
+	// opponent grid
 	playerMap = __WEBPACK_IMPORTED_MODULE_1__grid___default()({ playerName: "opponent"}, "playerInputHandler(this.id)");
 	playerMap.display(document.getElementById('opponentGrid'));
 
 }
 
-
-//window.Grid = Grid;
 window.opponent = opponent;
 window.player = player;
 window.playerInputHandler = playerInputHandler;
-//window.opponentMap = opponentMap;
-/*
-let battleship = ship({length: 5});
-console.log(battleship);
-
-function component() {
-  var element = document.createElement('div');
-
- // lodash, now imported by this script
-  element.innerHTML = _.join(['Hello', 'webpack'], ' ');
-
-  return element;
-}*/
-
-/**
-	creates players and sets coordinates for now without user input
-
-	randomly assign players turn, changes 
-	let gameOver = false;
-	while game is not over
-	if(player1.turn){
-
-         let them attack,
-         check if other players all ships r sunk then game is over = true, 
-         until no hits
-         next player's turn
-
-	}else{
-		AI
-	}*/
-/**
-let gameOver = false;
-
-while(!gameOver){
-	if(player1.turn){
-
-	}else{
-		//disable board by adding something over it where player cant click on anything
-	}
-}
-
-*/
-
-//document.body.appendChild(component());
 
 
 /***/ }),
@@ -389,18 +341,25 @@ const Player = () => {
 
 	let turn;
 	let gameboard = Object(__WEBPACK_IMPORTED_MODULE_0__gameboard__["a" /* default */])();
+    let successfulAttacks = [];
+    let missedAttacks = [];
 
 	function damage(enemy,pos){
-        return enemy.recieveAttack(pos) ? true : false;
+
+        if(enemy.recieveAttack(pos)){
+            this.successfulAttacks.push(pos);
+            return true;
+        }else{
+            this.missedAttacks.push(pos);
+            return false;
+        }
 	};
 
 	function stop(playerMap){
-		//this.gameboard.grid.disable();
         playerMap.disable();
 	};
 
 	function go(playerMap){
-		//this.gameboard.grid.enable();
         playerMap.enable();
 	};
 
@@ -408,15 +367,31 @@ const Player = () => {
         return this.gameboard.recieveAttack(pos) ? true : false;
     };
 
-    // for now make a random move
-    // return it only if it doesn't exist in missedMoves or hitMoves
+    function isShipSunk(ship){
+        return ship.isSunk();
+    }
+
+    function getShip(pos){ 
+        return this.gameboard.getShip(pos);
+    }
+
+    function showShipSunk(ship,id){
+
+        for(let i = 0; i< ship.length; i++){
+            let col = ship.coordinates[i][0];
+            let row = ship.coordinates[i][1];
+            let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
+            cell.className += ' wrecked';
+        }
+    }
+
     function getNextMove(){
         let pos = _getRandomCoordinate();
-
-        while(!_isValid(this.gameboard, pos)){
+        
+        while(!_isValid(this, pos)){
             pos = _getRandomCoordinate();
         }
-
+        
         return pos;
     };
 
@@ -431,7 +406,12 @@ const Player = () => {
         go,
         recieveAttack,
         getNextMove,
-        isDead
+        isDead,
+        isShipSunk,
+        showShipSunk,
+        getShip,
+        successfulAttacks,
+        missedAttacks
 	}
 
 };
@@ -440,15 +420,15 @@ const Player = () => {
 /* harmony default export */ __webpack_exports__["a"] = (Player);
 
 // prevents AI from making the same move twice
-function _isValid(gameboard, pos){
-    let sA = gameboard.successfulAttacks;
-    console.log(sA);
+function _isValid(player, pos){
+    let sA = player.successfulAttacks;
+    
     for(let i = 0; i< sA.length; i++){
         if(sA[i][0] === pos[0] &&  sA[i][1] === pos[1]){
             return false;
         }
     }
-    let missedHits = gameboard.missedAttacks;
+    let missedHits = player.missedAttacks;
     for(let x =0; x< missedHits.length; x++){
         if(missedHits[x][0] === pos[0] && missedHits[x][1] === pos[1]){
             return false;
@@ -479,8 +459,6 @@ function _getRandomCoordinate(){
 const Gameboard = () => {
 	let grid = _createGrid();
 	let ships = _createShips();
-	let missedAttacks = [];
-    let successfulAttacks = [];
 	let gridDOM;
 
 	function setCoordinates(){
@@ -501,25 +479,26 @@ const Gameboard = () => {
         return true;
 	};
 
-    // return true or false
+    function getShip(pos){
+        for(let i=0;i<this.ships.length;i++){
+            let ship = this.ships[i];
+            if(ship.isHit(pos)){
+                return ship; 
+            }
+        }
+    };
+
 	function recieveAttack(pos){
 		for(let i=0;i<this.ships.length; i++){
 			let ship = this.ships[i];
-			console.log("traversing ships..."+(i+1));
-            console.log(pos);
 			if(ship.isHit(pos)){
-				console.log("yes it got hit");
 				ship.hit(pos);
-                this.successfulAttacks.push(pos);
-                console.log(successfulAttacks);
 				return true;
 			}
 		}
-		this.missedAttacks.push(pos);
         return false;
 	};
 
-	// always in player grid
 	function createGridDOM(name, location){
 		this.gridDOM = __WEBPACK_IMPORTED_MODULE_1__grid___default()({ playerName : name });
 		this.gridDOM.display(location);
@@ -527,24 +506,21 @@ const Gameboard = () => {
 		for(let i = 0;i<this.ships.length;i++){
 			let coordinates = this.ships[i].coordinates;
 			for(let x = 0; x < coordinates.length; x++){
-				//let col = coordinates[x][0];// may have to switch 
-				//let row = coordinates[x][1];// these values
-				this.gridDOM.markShip(coordinates[x]);// give [a,b]
+				this.gridDOM.markShip(coordinates[x]);
 			}
 		}
 	};
-	// private
+	
 
 	return{
 		grid,
 		ships,
-		missedAttacks,
 		setCoordinates,
 		isGameOver,
 		recieveAttack,
 		gridDOM,
 		createGridDOM,
-        successfulAttacks
+        getShip
 	}
 };
 
@@ -597,59 +573,57 @@ function _createShips(){
 
 
 function _getCoordinates(grid, length){
-		let found = false;
-		let coords;
-		while(!found){
+	let found = false;
+	let coords;
+	while(!found){
 
-			let col = Math.floor(Math.random() * 10);// 0 to 9
-			let row = Math.floor(Math.random() * 10);
-			// check if col,row is empty otherwise do over
-			if(grid[col][row] === 'e'){
-				let dir = Math.floor(Math.random() * 2) ? "vertical" : "horizontal";
-				if(dir === "vertical"){
-					coords = _getVerticalCoords(grid, col,row,length);
-					if(coords.length >0){
-						found = true;
-					}
-				}else{
-					coords = _getHorizontalCoords(grid, col,row,length);
-					if(coords.length > 0){
-						found = true;
-					}
+		let col = Math.floor(Math.random() * 10);// 0 to 9
+		let row = Math.floor(Math.random() * 10);
+			
+		if(grid[col][row] === 'e'){
+			let dir = Math.floor(Math.random() * 2) ? "vertical" : "horizontal";
+			if(dir === "vertical"){
+				coords = _getVerticalCoords(grid, col,row,length);
+				if(coords.length >0){
+					found = true;
+				}
+			}else{
+				coords = _getHorizontalCoords(grid, col,row,length);
+				if(coords.length > 0){
+					found = true;
 				}
 			}
 		}
+	}
 
-		_updateBoard(grid, coords);
-		_displayBoard(grid);
-		return coords;
+	_updateBoard(grid, coords);
+	return coords;
 };
 
 function _updateBoard(grid, coords){
-		for(let i = 0; i < coords.length; i++){
-			let col = coords[i][0];
-			let row = coords[i][1];
-
-			grid[col][row] = 'o'; // occupied
-		}
+	for(let i = 0; i < coords.length; i++){
+		let col = coords[i][0];
+		let row = coords[i][1];
+		grid[col][row] = 'o'; // occupied
+	}
 };
 
 function _getVerticalCoords(grid, col, row, length){
 
-		let coordinates = [];
-		if( (row + (length-1) < 10) && _isPathClear(grid,col,row,length,"down")){
-			coordinates.push([col,row]);
-			for(let i = 1; i<length; i++){
-				coordinates.push( [col, row+i] );
-			}
-		}else if( (row - (length-1) > -1) && _isPathClear(grid, col,row,length,"up")){
-			coordinates.push( [col,row]);
-			for(let i = 1; i<length; i++){
-				coordinates.push( [col, row-i] );
-			}
+	let coordinates = [];
+	if( (row + (length-1) < 10) && _isPathClear(grid,col,row,length,"down")){
+		coordinates.push([col,row]);
+		for(let i = 1; i<length; i++){
+			coordinates.push( [col, row+i] );
 		}
+	}else if( (row - (length-1) > -1) && _isPathClear(grid, col,row,length,"up")){
+		coordinates.push( [col,row]);
+		for(let i = 1; i<length; i++){
+			coordinates.push( [col, row-i] );
+		}
+	}
 
-		return coordinates;
+	return coordinates;
 };
 
 
@@ -908,9 +882,7 @@ function _isDownSideEmpty(grid, coordinates, axis){
 
 }
 
-function _displayBoard(grid){
-	console.log(grid);
-};
+
 
 
 

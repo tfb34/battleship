@@ -53,8 +53,8 @@ table td{
 /*new*/
 #cover {
     width: 100%;
-    height: calc(11*var(--cell-height)); /*user variable here like 11 * cell-height*/
-    background-color: rgba(100,90,20, 0.5);
+    height: calc(11*var(--cell-height)); 
+    /*background-color: rgba(100,90,20, 0.5);*/
     position: absolute;
 }
 .hide{
@@ -63,14 +63,83 @@ table td{
 .show{
     display: block;
 }
+/* use this for sunk ship*/
 .hit{
 	color:red;
+}
+.hit:hover{
+	background-color: none;
+}
+.wrecked{
+	background-color: rgba(234, 126, 126,0.5);
+}
+.wrecked:hover{
 	background-color: rgba(234, 126, 126,0.5);
 }
 .miss{
 	color: grey;
 	background-color: beige;
 }
+.miss:hover{
+	background-color: beige;
+}
 .ship{
 	background-color: rgba(118, 167, 227,0.5);
 }
+/* when ship sinks*/
+.verticalTopBorder{
+    border-top: 1px solid red;
+    border-left: 1px solid red;
+    border-right: 1px solid red;
+}
+.verticalBottomBorder{
+    border-bottom: 1px solid red;
+    border-left: 1px solid red;
+    border-right: 1px solid red;
+}
+.verticalBorder{
+    border-left: 1px solid red;
+    border-right: 1px solid red;
+}
+.horizontalLeftBorder{
+    border-left: 1px solid red;
+    border-top: 1px solid red;
+    border-bottom: : 1px solid red;
+}
+.horizontalRightBorder{
+    border-right: 1px solid red;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+}
+.horizontalBorder{
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+}
+.redBorder{
+    border:1px solid red;
+}
+.half-screen{
+	width:50%;
+	clear: both;
+	display: inline-block;
+}
+#left-side p{
+	float:right;
+	margin-right: 11em;
+}
+
+#right-side p{
+	float:left;
+	margin-left: 13em;
+}
+#display-winner{
+	text-align: center;	
+	font-size:1.5em;
+	margin-bottom: 2em;
+}
+.title{
+	font-family: 'Audiowide', cursive;
+	margin-left: 1em;
+}
+
+

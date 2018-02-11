@@ -4,8 +4,6 @@ import Grid from './grid';
 const Gameboard = () => {
 	let grid = _createGrid();
 	let ships = _createShips();
-	let missedAttacks = [];
-    let successfulAttacks = [];
 	let gridDOM;
 
 	function setCoordinates(){
@@ -26,25 +24,26 @@ const Gameboard = () => {
         return true;
 	};
 
-    // return true or false
+    function getShip(pos){
+        for(let i=0;i<this.ships.length;i++){
+            let ship = this.ships[i];
+            if(ship.isHit(pos)){
+                return ship; 
+            }
+        }
+    };
+
 	function recieveAttack(pos){
 		for(let i=0;i<this.ships.length; i++){
 			let ship = this.ships[i];
-			console.log("traversing ships..."+(i+1));
-            console.log(pos);
 			if(ship.isHit(pos)){
-				console.log("yes it got hit");
 				ship.hit(pos);
-                this.successfulAttacks.push(pos);
-                console.log(successfulAttacks);
 				return true;
 			}
 		}
-		this.missedAttacks.push(pos);
         return false;
 	};
 
-	// always in player grid
 	function createGridDOM(name, location){
 		this.gridDOM = Grid({ playerName : name });
 		this.gridDOM.display(location);
@@ -52,24 +51,21 @@ const Gameboard = () => {
 		for(let i = 0;i<this.ships.length;i++){
 			let coordinates = this.ships[i].coordinates;
 			for(let x = 0; x < coordinates.length; x++){
-				//let col = coordinates[x][0];// may have to switch 
-				//let row = coordinates[x][1];// these values
-				this.gridDOM.markShip(coordinates[x]);// give [a,b]
+				this.gridDOM.markShip(coordinates[x]);
 			}
 		}
 	};
-	// private
+	
 
 	return{
 		grid,
 		ships,
-		missedAttacks,
 		setCoordinates,
 		isGameOver,
 		recieveAttack,
 		gridDOM,
 		createGridDOM,
-        successfulAttacks
+        getShip
 	}
 };
 
@@ -122,59 +118,57 @@ function _createShips(){
 
 
 function _getCoordinates(grid, length){
-		let found = false;
-		let coords;
-		while(!found){
+	let found = false;
+	let coords;
+	while(!found){
 
-			let col = Math.floor(Math.random() * 10);// 0 to 9
-			let row = Math.floor(Math.random() * 10);
-			// check if col,row is empty otherwise do over
-			if(grid[col][row] === 'e'){
-				let dir = Math.floor(Math.random() * 2) ? "vertical" : "horizontal";
-				if(dir === "vertical"){
-					coords = _getVerticalCoords(grid, col,row,length);
-					if(coords.length >0){
-						found = true;
-					}
-				}else{
-					coords = _getHorizontalCoords(grid, col,row,length);
-					if(coords.length > 0){
-						found = true;
-					}
+		let col = Math.floor(Math.random() * 10);// 0 to 9
+		let row = Math.floor(Math.random() * 10);
+			
+		if(grid[col][row] === 'e'){
+			let dir = Math.floor(Math.random() * 2) ? "vertical" : "horizontal";
+			if(dir === "vertical"){
+				coords = _getVerticalCoords(grid, col,row,length);
+				if(coords.length >0){
+					found = true;
+				}
+			}else{
+				coords = _getHorizontalCoords(grid, col,row,length);
+				if(coords.length > 0){
+					found = true;
 				}
 			}
 		}
+	}
 
-		_updateBoard(grid, coords);
-		_displayBoard(grid);
-		return coords;
+	_updateBoard(grid, coords);
+	return coords;
 };
 
 function _updateBoard(grid, coords){
-		for(let i = 0; i < coords.length; i++){
-			let col = coords[i][0];
-			let row = coords[i][1];
-
-			grid[col][row] = 'o'; // occupied
-		}
+	for(let i = 0; i < coords.length; i++){
+		let col = coords[i][0];
+		let row = coords[i][1];
+		grid[col][row] = 'o'; // occupied
+	}
 };
 
 function _getVerticalCoords(grid, col, row, length){
 
-		let coordinates = [];
-		if( (row + (length-1) < 10) && _isPathClear(grid,col,row,length,"down")){
-			coordinates.push([col,row]);
-			for(let i = 1; i<length; i++){
-				coordinates.push( [col, row+i] );
-			}
-		}else if( (row - (length-1) > -1) && _isPathClear(grid, col,row,length,"up")){
-			coordinates.push( [col,row]);
-			for(let i = 1; i<length; i++){
-				coordinates.push( [col, row-i] );
-			}
+	let coordinates = [];
+	if( (row + (length-1) < 10) && _isPathClear(grid,col,row,length,"down")){
+		coordinates.push([col,row]);
+		for(let i = 1; i<length; i++){
+			coordinates.push( [col, row+i] );
 		}
+	}else if( (row - (length-1) > -1) && _isPathClear(grid, col,row,length,"up")){
+		coordinates.push( [col,row]);
+		for(let i = 1; i<length; i++){
+			coordinates.push( [col, row-i] );
+		}
+	}
 
-		return coordinates;
+	return coordinates;
 };
 
 
@@ -433,7 +427,5 @@ function _isDownSideEmpty(grid, coordinates, axis){
 
 }
 
-function _displayBoard(grid){
-	console.log(grid);
-};
+
 
