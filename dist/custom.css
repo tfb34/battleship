@@ -166,5 +166,8 @@ table td{
 	cursor: pointer;
 	color:white;
 }
-
-
+.restart-btn{
+	cursor: pointer;
+	font-size: 30px;
+	color: blue;
+}

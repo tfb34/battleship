@@ -25,6 +25,7 @@ function playerInputHandler(coordinate) {
             player.stop(playerMap);
             let displayWinner = document.getElementById('display-winner');
             displayWinner.innerHTML = "You Win!";
+            displayWinner.appendChild(getRestartBtn());
         }
 
     }else{// computer's turn
@@ -53,6 +54,7 @@ function playerInputHandler(coordinate) {
                 if(player.isDead()){
                     let displayWinner = document.getElementById('display-winner');
                     displayWinner.innerHTML = "You Lose.";
+                    displayWinner.appendChild(getRestartBtn());
                     clearInterval(refreshId);// ensures that player does not get enabled
                 }
             }
@@ -90,6 +92,14 @@ function play(){
     randomizeBtn.className += " hide";
 }
 
+function getRestartBtn(){
+    let restartBtn = document.createElement('a');
+    restartBtn.innerHTML = "&#8634;";
+    restartBtn.setAttribute("class", "restart-btn");
+    restartBtn.setAttribute("onclick", "restart()");
+    return restartBtn;
+};
+
 function randomize(){
     clearPlayerGrid();
     player = Player();
@@ -104,8 +114,14 @@ function clearPlayerGrid(){
         grid.removeChild(grid.firstChild);
     }
 }
+
+function restart(){
+    location.reload();
+}
+
 window.opponent = opponent;
 window.player = player;
 window.playerInputHandler = playerInputHandler;
 window.randomize = randomize;
 window.play = play;
+window.restart = restart;
