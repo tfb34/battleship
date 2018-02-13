@@ -7,6 +7,8 @@ const Player = () => {
 	let gameboard = Gameboard();
     let successfulAttacks = [];
     let missedAttacks = [];
+    // ai
+    let workspace = [];
 
 	function damage(enemy,pos){
 
@@ -39,6 +41,11 @@ const Player = () => {
         return this.gameboard.getShip(pos);
     }
 
+    function isFinalBlow(enemy, hit){
+        let ship = enemy.getShip(hit);
+        return enemy.isShipSunk(ship);
+    }
+
     function showShipSunk(ship,id){
 
         for(let i = 0; i< ship.length; i++){
@@ -48,12 +55,25 @@ const Player = () => {
             cell.className += ' wrecked';
         }
     }
-
+    // utilize workspace
     function getNextMove(){
-        let pos = _getRandomCoordinate();
-        
-        while(!_isValid(this, pos)){
+        let pos;
+        if(this.workspace.length > 0){// hit?
+            let latestHitPos = this.workspace[this.workspace.length - 1];
+            // get array of adj. positions to latest hit position
+            let adjPositions = _getValidAdjPositions(this,latestHitPos);
+            while(adjPositions.length === 0){
+                this.workspace.pop();
+                latestHitPos = this.workspace[this.workspace.length - 1];
+                adjPositions = _getValidAdjPositions(this,latestHitPos);
+            }
+            // choose among valid adjacent positions
+            pos = _getEducatedGuess(adjPositions);
+        }else{
             pos = _getRandomCoordinate();
+            while(!_isValid(this, pos)){
+                pos = _getRandomCoordinate();
+            }
         }
         
         return pos;
@@ -61,6 +81,12 @@ const Player = () => {
 
     function isDead(){
         return this.gameboard.isGameOver();
+    };
+
+    function clearWorkspace(){
+        while(this.workspace.length>0){
+            this.workspace.pop();
+        }
     };
     
 	return {
@@ -75,7 +101,10 @@ const Player = () => {
         showShipSunk,
         getShip,
         successfulAttacks,
-        missedAttacks
+        missedAttacks,
+        clearWorkspace,
+        workspace,
+        isFinalBlow
 	}
 
 };
@@ -85,6 +114,7 @@ export default Player;
 
 // prevents AI from making the same move twice
 function _isValid(player, pos){
+
     let sA = player.successfulAttacks;
     
     for(let i = 0; i< sA.length; i++){
@@ -105,4 +135,41 @@ function _getRandomCoordinate(){
     let col = Math.floor(Math.random() * 10);
     let row = Math.floor(Math.random() * 10);
     return [col,row];
+}
+// problem: not getting valid adj positions
+function _getValidAdjPositions(player,pos){
+    let validAdjPos = [];
+    let col = pos[0];
+    let row = pos[1];
+    // cell above
+    if(!_isOutOfBounds([col,row-1]) && _isValid(player,[col,row-1])){
+        validAdjPos.push([col,row-1]);
+    }
+    // cell on right side
+    if(!_isOutOfBounds([col+1,row]) && _isValid(player,[col+1,row])){
+        validAdjPos.push([col+1,row]);   
+    }
+    // cell below
+    if(!_isOutOfBounds([col,row+1]) && _isValid(player,[col,row+1])){
+        validAdjPos.push([col,row+1]);
+    }
+    // cell on left side
+    if(!_isOutOfBounds([col-1,row]) && _isValid(player,[col-1,row])){
+        validAdjPos.push([col-1,row]);
+    }
+
+    return validAdjPos;
+}
+
+function _isOutOfBounds(pos){
+    
+    if(pos[0] > 9 || pos[0] < 0 || pos[1] > 9 || pos[1] < 0){
+        return true;
+    }
+    return false;
+}
+
+function _getEducatedGuess(arr){
+    let i = Math.floor(Math.random() * arr.length);
+    return arr[i];
 }

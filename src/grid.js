@@ -33,7 +33,6 @@ const Grid = ({playerName}) => {
 	}
 
 	function markMiss(pos, id){
-		console.log("inside markMiss");
 		let col = pos[0];
 		let row = pos[1];
 		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];

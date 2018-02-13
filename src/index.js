@@ -34,15 +34,22 @@ function playerInputHandler(coordinate) {
 
         let refreshId = setInterval(function(){
             
+            // AI thinks of a move
             let pos = opponent.getNextMove();
-                
-            if(!opponent.damage(player, pos)){
+            // makes move 
+            if(!opponent.damage(player, pos)){// no hit
                 
                 player.gameboard.gridDOM.markMiss(pos,"player"); 
                 player.go(playerMap);
                 clearInterval(refreshId);
-            }else{
+            }else{// hit
                 player.gameboard.gridDOM.markHit(pos,"player");
+                opponent.workspace.push(pos);// increase workspace
+                // check if this pos led to a ship sinking
+                if(opponent.isFinalBlow(player,pos)){
+                    opponent.clearWorkspace();
+                }
+
                 if(player.isDead()){
                     let displayWinner = document.getElementById('display-winner');
                     displayWinner.innerHTML = "You Lose.";
