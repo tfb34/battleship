@@ -62,6 +62,7 @@ function playerInputHandler(coordinate) {
        
 }
 
+
 window.onload = function(){
 	
 	// player
@@ -78,6 +79,33 @@ window.onload = function(){
 
 }
 
+function play(){
+    console.log("clicked on play");
+    let cover = document.getElementById('cover');
+    cover.className += " hide";
+    cover.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    let playBtn = document.getElementsByClassName('play-btn')[0];
+    playBtn.className += " hide";
+    let randomizeBtn = document.getElementsByClassName('options')[0];
+    randomizeBtn.className += " hide";
+}
+
+function randomize(){
+    clearPlayerGrid();
+    player = Player();
+    player.gameboard.setCoordinates();
+    player.gameboard.createGridDOM("player", playerGrid);
+
+}
+
+function clearPlayerGrid(){
+    let grid = document.getElementById('playerGrid');
+    while(grid.firstChild){
+        grid.removeChild(grid.firstChild);
+    }
+}
 window.opponent = opponent;
 window.player = player;
 window.playerInputHandler = playerInputHandler;
+window.randomize = randomize;
+window.play = play;

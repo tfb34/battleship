@@ -158,7 +158,6 @@ const Grid = ({playerName}) => {
 	}
 
 	function markMiss(pos, id){
-		console.log("inside markMiss");
 		let col = pos[0];
 		let row = pos[1];
 		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
@@ -297,12 +296,9 @@ function playerInputHandler(coordinate) {
             }else{// hit
                 player.gameboard.gridDOM.markHit(pos,"player");
                 opponent.workspace.push(pos);// increase workspace
-                console.log("outside, opponent.workspace: "+opponent.workspace);
                 // check if this pos led to a ship sinking
                 if(opponent.isFinalBlow(player,pos)){
-                    console.log("ship has sunk. workspace has been cleared.");
                     opponent.clearWorkspace();
-
                 }
 
                 if(player.isDead()){
@@ -316,6 +312,7 @@ function playerInputHandler(coordinate) {
     }
        
 }
+
 
 window.onload = function(){
 	
@@ -333,10 +330,36 @@ window.onload = function(){
 
 }
 
+function play(){
+    console.log("clicked on play");
+    let cover = document.getElementById('cover');
+    cover.className += " hide";
+    cover.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    let playBtn = document.getElementsByClassName('play-btn')[0];
+    playBtn.className += " hide";
+    let randomizeBtn = document.getElementsByClassName('options')[0];
+    randomizeBtn.className += " hide";
+}
+
+function randomize(){
+    clearPlayerGrid();
+    player = Object(__WEBPACK_IMPORTED_MODULE_2__player__["a" /* default */])();
+    player.gameboard.setCoordinates();
+    player.gameboard.createGridDOM("player", playerGrid);
+
+}
+
+function clearPlayerGrid(){
+    let grid = document.getElementById('playerGrid');
+    while(grid.firstChild){
+        grid.removeChild(grid.firstChild);
+    }
+}
 window.opponent = opponent;
 window.player = player;
 window.playerInputHandler = playerInputHandler;
-
+window.randomize = randomize;
+window.play = play;
 
 /***/ }),
 /* 3 */
@@ -414,7 +437,6 @@ const Player = () => {
                 adjPositions = _getValidAdjPositions(this,latestHitPos);
             }
             // choose among valid adjacent positions
-            console.log("inside getNextMove, adjPositions array: "+adjPositions);
             pos = _getEducatedGuess(adjPositions);
         }else{
             pos = _getRandomCoordinate();
@@ -461,10 +483,7 @@ const Player = () => {
 
 // prevents AI from making the same move twice
 function _isValid(player, pos){
-    console.log("inside is valid");
-    console.log("successfulAttacks: "+player.successfulAttacks);
-    console.log("missedAttacks: "+player.missedAttacks);
-    console.log("pos: "+pos);
+
     let sA = player.successfulAttacks;
     
     for(let i = 0; i< sA.length; i++){
@@ -488,8 +507,6 @@ function _getRandomCoordinate(){
 }
 // problem: not getting valid adj positions
 function _getValidAdjPositions(player,pos){
-    console.log("inside _getValidAdjPositions, current player: "+player);
-    console.log(player.workspace);
     let validAdjPos = [];
     let col = pos[0];
     let row = pos[1];
@@ -510,25 +527,19 @@ function _getValidAdjPositions(player,pos){
         validAdjPos.push([col-1,row]);
     }
 
-    console.log("pos: "+pos);
-    console.log("validAdjPositions : "+validAdjPos);
     return validAdjPos;
 }
 
 function _isOutOfBounds(pos){
-    console.log("inside _isOutOfBounds, pos: "+pos);
+    
     if(pos[0] > 9 || pos[0] < 0 || pos[1] > 9 || pos[1] < 0){
-        console.log("return true");
         return true;
     }
-    console.log("returns false");
     return false;
 }
 
 function _getEducatedGuess(arr){
-    console.log(arr);
     let i = Math.floor(Math.random() * arr.length);
-    console.log("Get Educated Guess : "+arr[i]);
     return arr[i];
 }
 
