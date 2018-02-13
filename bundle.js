@@ -158,7 +158,6 @@ const Grid = ({playerName}) => {
 	}
 
 	function markMiss(pos, id){
-		console.log("inside markMiss");
 		let col = pos[0];
 		let row = pos[1];
 		let cell = document.querySelectorAll('#'+id+' #c'+col+'r'+row)[0];
@@ -277,6 +276,7 @@ function playerInputHandler(coordinate) {
             player.stop(playerMap);
             let displayWinner = document.getElementById('display-winner');
             displayWinner.innerHTML = "You Win!";
+            displayWinner.appendChild(getRestartBtn());
         }
 
     }else{// computer's turn
@@ -286,18 +286,26 @@ function playerInputHandler(coordinate) {
 
         let refreshId = setInterval(function(){
             
+            // AI thinks of a move
             let pos = opponent.getNextMove();
-                
-            if(!opponent.damage(player, pos)){
+            // makes move 
+            if(!opponent.damage(player, pos)){// no hit
                 
                 player.gameboard.gridDOM.markMiss(pos,"player"); 
                 player.go(playerMap);
                 clearInterval(refreshId);
-            }else{
+            }else{// hit
                 player.gameboard.gridDOM.markHit(pos,"player");
+                opponent.workspace.push(pos);// increase workspace
+                // check if this pos led to a ship sinking
+                if(opponent.isFinalBlow(player,pos)){
+                    opponent.clearWorkspace();
+                }
+
                 if(player.isDead()){
                     let displayWinner = document.getElementById('display-winner');
                     displayWinner.innerHTML = "You Lose.";
+                    displayWinner.appendChild(getRestartBtn());
                     clearInterval(refreshId);// ensures that player does not get enabled
                 }
             }
@@ -306,6 +314,7 @@ function playerInputHandler(coordinate) {
     }
        
 }
+
 
 window.onload = function(){
 	
@@ -323,10 +332,50 @@ window.onload = function(){
 
 }
 
+function play(){
+    console.log("clicked on play");
+    let cover = document.getElementById('cover');
+    cover.className += " hide";
+    cover.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    let playBtn = document.getElementsByClassName('play-btn')[0];
+    playBtn.className += " hide";
+    let randomizeBtn = document.getElementsByClassName('options')[0];
+    randomizeBtn.className += " hide";
+}
+
+function getRestartBtn(){
+    let restartBtn = document.createElement('a');
+    restartBtn.innerHTML = "&#8634;";
+    restartBtn.setAttribute("class", "restart-btn");
+    restartBtn.setAttribute("onclick", "restart()");
+    return restartBtn;
+};
+
+function randomize(){
+    clearPlayerGrid();
+    player = Object(__WEBPACK_IMPORTED_MODULE_2__player__["a" /* default */])();
+    player.gameboard.setCoordinates();
+    player.gameboard.createGridDOM("player", playerGrid);
+
+}
+
+function clearPlayerGrid(){
+    let grid = document.getElementById('playerGrid');
+    while(grid.firstChild){
+        grid.removeChild(grid.firstChild);
+    }
+}
+
+function restart(){
+    location.reload();
+}
+
 window.opponent = opponent;
 window.player = player;
 window.playerInputHandler = playerInputHandler;
-
+window.randomize = randomize;
+window.play = play;
+window.restart = restart;
 
 /***/ }),
 /* 3 */
@@ -343,6 +392,8 @@ const Player = () => {
 	let gameboard = Object(__WEBPACK_IMPORTED_MODULE_0__gameboard__["a" /* default */])();
     let successfulAttacks = [];
     let missedAttacks = [];
+    // ai
+    let workspace = [];
 
 	function damage(enemy,pos){
 
@@ -375,6 +426,11 @@ const Player = () => {
         return this.gameboard.getShip(pos);
     }
 
+    function isFinalBlow(enemy, hit){
+        let ship = enemy.getShip(hit);
+        return enemy.isShipSunk(ship);
+    }
+
     function showShipSunk(ship,id){
 
         for(let i = 0; i< ship.length; i++){
@@ -384,12 +440,25 @@ const Player = () => {
             cell.className += ' wrecked';
         }
     }
-
+    // utilize workspace
     function getNextMove(){
-        let pos = _getRandomCoordinate();
-        
-        while(!_isValid(this, pos)){
+        let pos;
+        if(this.workspace.length > 0){// hit?
+            let latestHitPos = this.workspace[this.workspace.length - 1];
+            // get array of adj. positions to latest hit position
+            let adjPositions = _getValidAdjPositions(this,latestHitPos);
+            while(adjPositions.length === 0){
+                this.workspace.pop();
+                latestHitPos = this.workspace[this.workspace.length - 1];
+                adjPositions = _getValidAdjPositions(this,latestHitPos);
+            }
+            // choose among valid adjacent positions
+            pos = _getEducatedGuess(adjPositions);
+        }else{
             pos = _getRandomCoordinate();
+            while(!_isValid(this, pos)){
+                pos = _getRandomCoordinate();
+            }
         }
         
         return pos;
@@ -397,6 +466,12 @@ const Player = () => {
 
     function isDead(){
         return this.gameboard.isGameOver();
+    };
+
+    function clearWorkspace(){
+        while(this.workspace.length>0){
+            this.workspace.pop();
+        }
     };
     
 	return {
@@ -411,7 +486,10 @@ const Player = () => {
         showShipSunk,
         getShip,
         successfulAttacks,
-        missedAttacks
+        missedAttacks,
+        clearWorkspace,
+        workspace,
+        isFinalBlow
 	}
 
 };
@@ -421,6 +499,7 @@ const Player = () => {
 
 // prevents AI from making the same move twice
 function _isValid(player, pos){
+
     let sA = player.successfulAttacks;
     
     for(let i = 0; i< sA.length; i++){
@@ -442,7 +521,43 @@ function _getRandomCoordinate(){
     let row = Math.floor(Math.random() * 10);
     return [col,row];
 }
+// problem: not getting valid adj positions
+function _getValidAdjPositions(player,pos){
+    let validAdjPos = [];
+    let col = pos[0];
+    let row = pos[1];
+    // cell above
+    if(!_isOutOfBounds([col,row-1]) && _isValid(player,[col,row-1])){
+        validAdjPos.push([col,row-1]);
+    }
+    // cell on right side
+    if(!_isOutOfBounds([col+1,row]) && _isValid(player,[col+1,row])){
+        validAdjPos.push([col+1,row]);   
+    }
+    // cell below
+    if(!_isOutOfBounds([col,row+1]) && _isValid(player,[col,row+1])){
+        validAdjPos.push([col,row+1]);
+    }
+    // cell on left side
+    if(!_isOutOfBounds([col-1,row]) && _isValid(player,[col-1,row])){
+        validAdjPos.push([col-1,row]);
+    }
 
+    return validAdjPos;
+}
+
+function _isOutOfBounds(pos){
+    
+    if(pos[0] > 9 || pos[0] < 0 || pos[1] > 9 || pos[1] < 0){
+        return true;
+    }
+    return false;
+}
+
+function _getEducatedGuess(arr){
+    let i = Math.floor(Math.random() * arr.length);
+    return arr[i];
+}
 
 /***/ }),
 /* 4 */
