@@ -277,6 +277,7 @@ function playerInputHandler(coordinate) {
             let displayWinner = document.getElementById('display-winner');
             displayWinner.innerHTML = "You Win!";
             displayWinner.appendChild(getRestartBtn());
+            addGiphy("winner");
         }
 
     }else{// computer's turn
@@ -306,6 +307,7 @@ function playerInputHandler(coordinate) {
                     let displayWinner = document.getElementById('display-winner');
                     displayWinner.innerHTML = "You Lose.";
                     displayWinner.appendChild(getRestartBtn());
+                    addGiphy("loser");
                     clearInterval(refreshId);// ensures that player does not get enabled
                 }
             }
@@ -370,12 +372,30 @@ function restart(){
     location.reload();
 }
 
+function addGiphy(str){
+    let r = 'https://api.giphy.com/v1/gifs/translate?api_key=lwruPkURFqMcbywpQQKRElLX6NPl6ySI&s='+str;
+    fetch(r, {mode: 'cors'})
+        .then(function(response){
+            return response.json()
+        })
+        .then(function(response){
+            let giphy = document.getElementById('giphy');
+            giphy.src = response.data.images.original.url
+            giphy.className = "show";
+
+        })
+        .catch(e => {
+            console.log("There was an error in retreiving giphy");
+    })
+}
+
 window.opponent = opponent;
 window.player = player;
 window.playerInputHandler = playerInputHandler;
 window.randomize = randomize;
 window.play = play;
 window.restart = restart;
+window.addGiphy = addGiphy;
 
 /***/ }),
 /* 3 */
