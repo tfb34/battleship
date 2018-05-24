@@ -127,11 +127,13 @@ table td{
 #left-side p{
 	float:right;
 	margin-right: 11em;
+	color:white;
 }
 
 #right-side p{
 	float:left;
 	margin-left: 13em;
+	color:white;
 }
 #display-winner{
 	text-align: center;	
@@ -159,6 +161,10 @@ table td{
 	margin-right: 10em;
 	float: right;
 	text-decoration: none;
+	border: 1px solid purple;
+    border-radius: 1em;
+    padding: 0.5em;
+    background-color: white
 }
 .play-btn{
 	height:3em;
