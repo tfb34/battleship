@@ -5,6 +5,7 @@
 body{
 	padding:0;
 	margin:0;
+	background: radial-gradient(ellipse at bottom, #1b2735 0%, black 100%)
 }
 table{
 	border-spacing: 0;
@@ -54,7 +55,7 @@ table td{
 #cover {
     width: 45%;
     height: calc(11*var(--cell-height)); 
-    background-color: rgba(0,0,0, 0.1);
+    /*background-color: rgba(0,0,0, 0.1);*/
     position: absolute;
 }
 .hide{
@@ -65,7 +66,7 @@ table td{
 }
 /* use this for sunk ship*/
 .hit{
-	color:red;
+	color:white;
 }
 .hit:hover{
 	background-color: none;
@@ -126,20 +127,27 @@ table td{
 #left-side p{
 	float:right;
 	margin-right: 11em;
+	color:white;
 }
 
 #right-side p{
 	float:left;
 	margin-left: 13em;
+	color:white;
 }
 #display-winner{
 	text-align: center;	
 	font-size:1.5em;
 	margin-bottom: 2em;
+	color:white;
 }
 .title{
 	font-family: 'Audiowide', cursive;
 	margin-left: 1em;
+	letter-spacing: 1em;
+	margin-top:1em;
+	color:white;
+	text-align: center;
 }
 .options{
 	width:50%;
@@ -153,6 +161,10 @@ table td{
 	margin-right: 10em;
 	float: right;
 	text-decoration: none;
+	border: 1px solid purple;
+    border-radius: 1em;
+    padding: 0.5em;
+    background-color: white
 }
 .play-btn{
 	height:3em;
@@ -172,7 +184,7 @@ table td{
 	color: blue;
 }
 #giphy{
-	margin-left: 28em;
+	margin: 0 auto;
 	width: 20em;
 	margin-bottom: 2em;
 }
