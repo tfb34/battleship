@@ -2,10 +2,15 @@
     --cell-height: 35px;
 }
 
+html{
+	overflow-y: hidden;
+}
 body{
+	height:100%;
+	width:100%;
 	padding:0;
 	margin:0;
-	background: radial-gradient(ellipse at bottom, #1b2735 0%, black 100%)
+	background: radial-gradient(ellipse at bottom, #1b2735 0%, black 100%);
 }
 table{
 	border-spacing: 0;
@@ -161,7 +166,6 @@ table td{
 	margin-right: 10em;
 	float: right;
 	text-decoration: none;
-	border: 1px solid purple;
     border-radius: 1em;
     padding: 0.5em;
     background-color: white
@@ -177,6 +181,7 @@ table td{
 	margin-top: 10em;
 	cursor: pointer;
 	color:white;
+	z-index:2;
 }
 .restart-btn{
 	cursor: pointer;
@@ -187,4 +192,57 @@ table td{
 	margin: 0 auto;
 	width: 20em;
 	margin-bottom: 2em;
+}
+.bigStar{
+	position:absolute;
+	height:3px;
+	width:3px;
+	background-color:white;
+	-webkit-animation: animateStar 150s linear infinite;
+	animation: animateStar 150s linear infinite;
+}
+.bigStar:after{
+	content: " ";
+    position: absolute;
+    top: 2000px;
+    width: 3px
+    height: 3px
+}
+.mediumStar{
+	position:absolute;
+	height:2px;
+	width:2px;
+	background-color:white;
+	-webkit-animation: animateStar 100s linear infinite;
+	animation: animateStar 100s linear infinite;
+}
+.mediumStar:after{
+	content: " "
+    position: absolute;
+    top: 2000px;
+    width: 2px
+    height: 2px
+}
+.smallStar{
+	position: absolute;
+	height:1px;
+	width:1px;
+	background-color: white;
+	-webkit-animation:animateStar 50s linear infinite;
+	animation:animateStar 50s linear infinite;
+}
+.smallStar:after{
+	content: " "
+    position: absolute
+    top: 2000px
+    width: 1px
+    height: 1px
+}
+@-webkit-keyframes animateStar{
+	from{transform: translateY(0);}
+	to{transform: translateY(-1000px);}
+}
+@keyframes animateStar{
+	from{transform: translateY(0);}
+	to{transform: translateY(-1000px);}
 }

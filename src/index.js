@@ -80,7 +80,23 @@ window.onload = function(){
 	// opponent grid
 	playerMap = Grid({ playerName: "opponent"}, "playerInputHandler(this.id)");
 	playerMap.display(document.getElementById('opponentGrid'));
+    createStars(100,BSTAR);
+    createStars(200,MSTAR);
+    createStars(700,SSTAR);
+}
 
+/*stars*/
+const BSTAR = "bigStar";
+const MSTAR = "mediumStar";
+const SSTAR = "smallStar"
+function createStars(num,starSize){
+    for(let i=0;i<num;i++){
+        let star= document.createElement("div");
+        star.setAttribute("class",starSize);
+        star.style.top = Math.floor(Math.random() * 2000)+"px";
+        star.style.left = Math.floor(Math.random() * (document.documentElement.clientWidth-10))+"px";
+        document.getElementsByTagName('body')[0].appendChild(star);
+    }
 }
 
 function play(){
