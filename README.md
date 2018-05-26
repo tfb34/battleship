@@ -1,8 +1,8 @@
 # Battleship
 
-Battleship is a guessing game for two players.I n this game you will be playing against the computer. Each player gets a 10x10 grid to place their fleets of ships on. The locations of the fleet are concealed from the other player. Players take turns calling "shots" at the other player's ships. The objective of the game is to destroy the other player's fleet. For more information, <a href="https://en.wikipedia.org/wiki/Battleship_(game)">Battleship(game) wikipedia.</a>
+Battleship is a guessing game for two players. In this game you will be playing against the computer. Each player gets a 10x10 grid to place their fleets of ships on. The locations of the fleet are concealed from the other player. Players take turns calling "shots" at the other player's ships. The objective of the game is to destroy the other player's fleet. For more information, <a href="https://en.wikipedia.org/wiki/Battleship_(game)">Battleship(game) wikipedia.</a>
 
-##Getting Started
+## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development purposes. See deployment for notes on how to deploy the project on a live system. 
 
