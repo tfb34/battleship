@@ -17,7 +17,7 @@ Before you begin, make sure you have the latest version of <a href="https://node
 3. Change the current working directory to the location where you want the project.
 4. Type git clone, and then paste the URL you copied earlier.
 ```
-$ git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
+$ git clone https://github.com/tfb34/battleship.git
 ```
 5. Press Enter. You should now have a copy of the project on your computer.
 ## Development
