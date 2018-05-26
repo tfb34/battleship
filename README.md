@@ -12,16 +12,21 @@ Before you begin, make sure you have the latest version of <a href="https://node
 
 ## Installing
 
-On GitHub, click on the clone or download button and copy  URL.
-Open your terminal or command line.
-Change the current working directory to the location where you want the project.
-Type git clone, and then paste the URL you copied earlier.
-Press Enter. You should now have a copy of the project on your computer.
-
-
-Open your text editor and open the folder where the project resides. 
-When making changes to any of the files in /src make sure to save and run npx webpack in terminal/cmd. 
-
+1. On GitHub, click on the <b>clone or download</b> button and copy  URL.
+2. Open your terminal or command line.
+3. Change the current working directory to the location where you want the project.
+4. Type git clone, and then paste the URL you copied earlier.
+```
+$ git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
+```
+5. Press Enter. You should now have a copy of the project on your computer.
+## Development
+1. Open your text editor and open the folder where the project resides. 
+2. When making changes to any of the files in /src make sure to save and run npx webpack in terminal/cmd. 
+```
+$ npx webpack
+```
+3. To see your changes, go to /dist and open index.html with browser of your choice. 
 ## Problems
 If by any chance you are gettings errors when trying to bundle the files. Delete node_modules and package-lock.json. 
 Then make a local installation of webpack :
