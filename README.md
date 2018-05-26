@@ -28,11 +28,15 @@ $ npx webpack
 ```
 3. To see your changes, go to /dist and open index.html with browser of your choice. 
 ## Problems
-If by any chance you are gettings errors when trying to bundle the files. Delete node_modules and package-lock.json. 
-Then make a local installation of webpack :
+If by any chance you are getting errors when trying to bundle the files, then delete node_modules and package-lock.json. 
+Now make a local installation of webpack :
+```
 npm install --save-dev webpack
-And install the webpack-cli(the tool used to run webpack on the command line):
+```
+Install the webpack-cli(the tool used to run webpack on the command line):
+```
 npm install webpack webpack-cli --save-dev
+```
 Now trying running npx webpack again and it shoud now successfully create a bundle. 
 
 ## Deployment
