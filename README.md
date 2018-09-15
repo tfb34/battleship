@@ -37,7 +37,7 @@ Install the webpack-cli(the tool used to run webpack on the command line):
 ```
 npm install webpack webpack-cli --save-dev
 ```
-Now trying running npx webpack again and it shoud now successfully create a bundle. 
+Now trying running npx webpack again and it should now successfully create a bundle. 
 
 ## Deployment
 <a href="https://tfb34.github.io/battleship/">Play in Browser</a>
